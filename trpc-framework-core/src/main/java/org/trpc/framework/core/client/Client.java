@@ -69,10 +69,13 @@ public class Client {
         client.setClientConfig(clientConfig);
         RpcReference rpcReference = client.startClientApplication();
         DataService dataService = rpcReference.get(DataService.class);
+        // 调用100次远程的sendData()方法
         for(int i=0;i<100;i++){
             String result = dataService.sendData("test");
             System.out.println(result);
         }
+        // 调用1次远程的getList()方法
+        System.out.println(dataService.getList());
     }
 
     /**
