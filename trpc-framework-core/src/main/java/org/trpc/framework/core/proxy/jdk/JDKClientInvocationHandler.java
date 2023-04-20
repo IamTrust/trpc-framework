@@ -32,8 +32,11 @@ public class JDKClientInvocationHandler implements InvocationHandler {
         rpcInvocation.setTargetServiceName(clazz.getName());
         rpcInvocation.setUuid(UUID.randomUUID().toString());
         RESP_MAP.put(rpcInvocation.getUuid(), OBJECT);
+        //加入发送队列，此队列是阻塞队列，由专门的发送线程负责与服务端通信。
+        //队列为空则发送线程会阻塞，队列不为空时发送线程会从队列中取出元素进行发送
         SEND_QUEUE.add(rpcInvocation);
         long beginTime = System.currentTimeMillis();
+        //收到响应后在netty框架的响应处理中会将响应信息加入RESP_MAP，因此从该map中get到对应uuid的信息就说明响应到达了
         while (System.currentTimeMillis() - beginTime < 3*1000) { // 超时时间为3秒，后期用配置文件调整
             Object object = RESP_MAP.get(rpcInvocation.getUuid());
             if (object instanceof RpcInvocation) {

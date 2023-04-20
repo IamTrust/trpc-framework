@@ -85,7 +85,7 @@ public class Client {
     }
 
     /**
-     * 异步发送信息任务
+     * 异步发送信息的任务
      *
      */
     class AsyncSendJob implements Runnable {
@@ -98,9 +98,9 @@ public class Client {
 
         @Override
         public void run() {
-            while (true) {
+            for (;;) {
                 try {
-                    //阻塞模式
+                    //阻塞模式, 如果队列为空, take 方法会一直等待直到队列非空
                     RpcInvocation data = SEND_QUEUE.take();
                     //将RpcInvocation封装到RpcProtocol对象中，然后发送给服务端，这里正好对应了上文中的ServerHandler
                     String json = JSON.toJSONString(data);
