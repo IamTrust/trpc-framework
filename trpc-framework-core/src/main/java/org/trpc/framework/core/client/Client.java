@@ -55,7 +55,7 @@ public class Client {
         ChannelFuture channelFuture = bootstrap.connect(clientConfig.getServerAddr(), clientConfig.getPort()).sync();
         logger.info("============ 服务启动 ============");
         this.startClient(channelFuture);
-        //这里注入了一个代理工厂，这个代理类在下文会仔细介绍
+        //创建了一个代理工厂，内部代理负责真正的 RPC 调用，但对于使用者来说就像调用本地方法一样
         RpcReference rpcReference = new RpcReference(new JDKProxyFactory());
         return rpcReference;
     }
