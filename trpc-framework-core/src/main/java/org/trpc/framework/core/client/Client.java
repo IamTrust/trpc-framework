@@ -14,6 +14,7 @@ import org.trpc.framework.core.common.RpcDecoder;
 import org.trpc.framework.core.common.RpcEncoder;
 import org.trpc.framework.core.common.RpcInvocation;
 import org.trpc.framework.core.common.RpcProtocol;
+import org.trpc.framework.core.config.ClientConfig;
 import org.trpc.framework.core.proxy.jdk.JDKProxyFactory;
 import org.trpc.framework.interfaces.DataService;
 

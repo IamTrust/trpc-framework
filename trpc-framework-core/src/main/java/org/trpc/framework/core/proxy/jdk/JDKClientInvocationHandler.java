@@ -14,6 +14,9 @@ import static org.trpc.framework.core.cache.CommonClientCache.SEND_QUEUE;
  * JDK 动态代理的三个参数：1-目标类实现的接口，2-目标类的类加载器，3-代理后的具体处理
  * 这个类即定义 JDK 动态代理的具体处理
  * 主要为向服务端发起远程调用
+ *
+ * @author Trust会长
+ * @Date 2023/4/20
  */
 public class JDKClientInvocationHandler implements InvocationHandler {
     private final static Object OBJECT = new Object();

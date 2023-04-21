@@ -6,6 +6,9 @@ import io.netty.handler.codec.MessageToByteEncoder;
 
 /**
  * 序列化
+ *
+ * @author Trust会长
+ * @Date 2023/4/20
  */
 public class RpcEncoder extends MessageToByteEncoder<RpcProtocol> {
     @Override

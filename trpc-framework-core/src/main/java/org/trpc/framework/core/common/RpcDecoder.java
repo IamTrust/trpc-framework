@@ -10,6 +10,9 @@ import static org.trpc.framework.core.constant.RpcConstants.MAGIC_NUMBER;
 
 /**
  * 反序列化
+ *
+ * @author Trust会长
+ * @Date 2023/4/20
  */
 public class RpcDecoder extends ByteToMessageDecoder {
     /**

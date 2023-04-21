@@ -6,6 +6,9 @@ import static org.trpc.framework.core.constant.RpcConstants.MAGIC_NUMBER;
 
 /**
  * 数据协议
+ *
+ * @author Trust会长
+ * @Date 2023/4/20
  */
 public class RpcProtocol implements Serializable {
     private static final long serialVersionUID = 5359096060555795690L;

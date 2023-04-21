@@ -6,6 +6,9 @@ import java.lang.reflect.Proxy;
 
 /**
  * JDK 动态代理
+ *
+ * @author Trust会长
+ * @Date 2023/4/20
  */
 public class JDKProxyFactory implements ProxyFactory {
     @Override

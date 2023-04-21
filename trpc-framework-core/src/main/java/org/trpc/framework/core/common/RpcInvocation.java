@@ -2,6 +2,9 @@ package org.trpc.framework.core.common;
 
 /**
  * 封装一次远程调用
+ *
+ * @author Trust会长
+ * @Date 2023/4/20
  */
 public class RpcInvocation {
     //请求的目标方法
