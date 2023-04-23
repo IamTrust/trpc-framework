@@ -7,13 +7,33 @@ package org.trpc.framework.core.config;
  * @Date 2023/4/20
  */
 public class ServerConfig {
-    private int port;
+    private Integer serverPort;
 
-    public int getPort() {
-        return port;
+    private String registerAddr;
+
+    private String applicationName;
+
+    public String getRegisterAddr() {
+        return registerAddr;
     }
 
-    public void setPort(int port) {
-        this.port = port;
+    public void setRegisterAddr(String registerAddr) {
+        this.registerAddr = registerAddr;
+    }
+
+    public Integer getServerPort() {
+        return serverPort;
+    }
+
+    public void setServerPort(Integer serverPort) {
+        this.serverPort = serverPort;
+    }
+
+    public String getApplicationName() {
+        return applicationName;
+    }
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
     }
 }

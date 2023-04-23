@@ -6,7 +6,7 @@ import org.trpc.framework.core.common.event.TRpcEvent;
 import org.trpc.framework.core.common.event.TRpcListenerLoader;
 import org.trpc.framework.core.common.event.TRpcUpdateEvent;
 import org.trpc.framework.core.common.event.data.URLChangeWrapper;
-import org.trpc.framework.core.registry.AbstractRegistry;
+import org.trpc.framework.core.registry.AbstractRegister;
 import org.trpc.framework.core.registry.RegistryService;
 import org.trpc.framework.core.registry.URL;
 
@@ -18,7 +18,7 @@ import java.util.List;
  * @author Trust会长
  * @Date 2023/4/23
  */
-public class ZookeeperRegister extends AbstractRegistry implements RegistryService {
+public class ZookeeperRegister extends AbstractRegister implements RegistryService {
     private AbstractZookeeperClient zkClient;
 
     private static final String ROOT = "/trpc";

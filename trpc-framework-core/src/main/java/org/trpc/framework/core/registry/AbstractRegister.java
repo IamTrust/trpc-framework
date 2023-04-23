@@ -12,7 +12,7 @@ import static org.trpc.framework.core.cache.CommonServerCache.PROVIDER_URL_SET;
  * @author Trust会长
  * @Date 2023/4/21
  */
-public abstract class AbstractRegistry implements RegistryService {
+public abstract class AbstractRegister implements RegistryService {
     @Override
     public void register(URL url) {
         PROVIDER_URL_SET.add(url);
