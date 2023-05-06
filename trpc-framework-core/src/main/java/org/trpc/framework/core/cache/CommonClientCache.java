@@ -6,6 +6,7 @@ import org.trpc.framework.core.common.ChannelFutureWrapper;
 import org.trpc.framework.core.common.RpcInvocation;
 import org.trpc.framework.core.registry.URL;
 import org.trpc.framework.core.router.IRouter;
+import org.trpc.framework.core.serialize.SerializeFactory;
 
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -33,5 +34,8 @@ public class CommonClientCache {
     //随机请求的map
     public static Map<String, ChannelFutureWrapper[]> SERVICE_ROUTER_MAP = new ConcurrentHashMap<>();
     public static ChannelFuturePollingRef CHANNEL_FUTURE_POLLING_REF = new ChannelFuturePollingRef();
+    // 路由层所用负载均衡策略
     public static IRouter IROUTER;
+    // 序列化层所用序列化技术
+    public static SerializeFactory CLIENT_SERIALIZE_FACTORY;
 }

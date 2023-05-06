@@ -1,12 +1,14 @@
 package org.trpc.framework.core.common;
 
+import java.io.Serializable;
+
 /**
  * 封装一次远程调用
  *
  * @author Trust会长
  * @Date 2023/4/20
  */
-public class RpcInvocation {
+public class RpcInvocation implements Serializable {
     //请求的目标方法
     private String targetMethod;
     //请求的目标服务名称

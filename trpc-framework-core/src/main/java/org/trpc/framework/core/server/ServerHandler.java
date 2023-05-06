@@ -10,6 +10,7 @@ import org.trpc.framework.core.common.RpcProtocol;
 import java.lang.reflect.Method;
 
 import static org.trpc.framework.core.cache.CommonServerCache.PROVIDER_CLASS_MAP;
+import static org.trpc.framework.core.cache.CommonServerCache.SERVER_SERIALIZE_FACTORY;
 
 /**
  * 请求处理
@@ -18,8 +19,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         RpcProtocol rpcProtocol = (RpcProtocol) msg;
-        String json = new String(rpcProtocol.getContent(), 0, rpcProtocol.getContentLength());
-        RpcInvocation rpcInvocation = JSON.parseObject(json, RpcInvocation.class);
+        RpcInvocation rpcInvocation = SERVER_SERIALIZE_FACTORY.deserialize(rpcProtocol.getContent(), RpcInvocation.class);
         Object aimObject = PROVIDER_CLASS_MAP.get(rpcInvocation.getTargetServiceName());
         Method[] methods = aimObject.getClass().getDeclaredMethods();
         Object result = null;

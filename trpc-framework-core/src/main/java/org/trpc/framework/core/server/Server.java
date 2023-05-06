@@ -15,9 +15,12 @@ import org.trpc.framework.core.config.ServerConfig;
 import org.trpc.framework.core.registry.RegistryService;
 import org.trpc.framework.core.registry.URL;
 import org.trpc.framework.core.registry.zookeeper.ZookeeperRegister;
+import org.trpc.framework.core.serialize.fastjson.FastJsonSerializeFactory;
+import org.trpc.framework.core.serialize.jdk.JDKSerializeFactory;
 
-import static org.trpc.framework.core.cache.CommonServerCache.PROVIDER_CLASS_MAP;
-import static org.trpc.framework.core.cache.CommonServerCache.PROVIDER_URL_SET;
+import static org.trpc.framework.core.cache.CommonServerCache.*;
+import static org.trpc.framework.core.constant.RpcConstants.FAST_JSON_SERIALIZE;
+import static org.trpc.framework.core.constant.RpcConstants.JDK_SERIALIZE;
 
 /**
  * 测试用远程调用服务端
@@ -67,6 +70,18 @@ public class Server {
     public void initServerConfig() {
         ServerConfig serverConfig = PropertiesBootstrap.loadServerConfigFromLocal();
         this.setServerConfig(serverConfig);
+        // 序列化策略
+        String serverSerialize = serverConfig.getServerSerialize();
+        switch (serverSerialize) {
+            case JDK_SERIALIZE:
+                SERVER_SERIALIZE_FACTORY = new JDKSerializeFactory();
+                break;
+            case FAST_JSON_SERIALIZE:
+                SERVER_SERIALIZE_FACTORY = new FastJsonSerializeFactory();
+                break;
+            default:
+                throw new RuntimeException("不支持的序列化策略: " + serverSerialize);
+        }
     }
 
     /**

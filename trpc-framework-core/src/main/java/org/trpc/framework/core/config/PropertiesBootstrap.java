@@ -9,8 +9,9 @@ public class PropertiesBootstrap {
     public static final String REGISTER_ADDRESS = "trpc.registerAddr";
     public static final String APPLICATION_NAME = "trpc.applicationName";
     public static final String PROXY_TYPE = "trpc.proxyType";
-
     public static final String ROUTER_STRATEGY = "trpc.routerStrategy";
+    public static final String CLIENT_SERIALIZE = "trpc.clientSerialize";
+    public static final String SERVER_SERIALIZE = "trpc.serverSerialize";
 
     public static ServerConfig loadServerConfigFromLocal() {
         try {
@@ -22,6 +23,7 @@ public class PropertiesBootstrap {
         serverConfig.setServerPort(PropertiesLoader.getPropertiesInteger(SERVER_PORT));
         serverConfig.setApplicationName(PropertiesLoader.getPropertiesStr(APPLICATION_NAME));
         serverConfig.setRegisterAddr(PropertiesLoader.getPropertiesStr(REGISTER_ADDRESS));
+        serverConfig.setServerSerialize(PropertiesLoader.getPropertiesStr(SERVER_SERIALIZE));
         return serverConfig;
     }
 
@@ -36,6 +38,7 @@ public class PropertiesBootstrap {
         clientConfig.setRegisterAddr(PropertiesLoader.getPropertiesStr(REGISTER_ADDRESS));
         clientConfig.setProxyType(PropertiesLoader.getPropertiesStr(PROXY_TYPE));
         clientConfig.setRouterStrategy(PropertiesLoader.getPropertiesStr(ROUTER_STRATEGY));
+        clientConfig.setClientSerialize(PropertiesLoader.getPropertiesStr(CLIENT_SERIALIZE));
         return clientConfig;
     }
 

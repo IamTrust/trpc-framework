@@ -1,6 +1,7 @@
 package org.trpc.framework.core.cache;
 
 import org.trpc.framework.core.registry.URL;
+import org.trpc.framework.core.serialize.SerializeFactory;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,4 +24,8 @@ public class CommonServerCache {
      * 所有服务的 URL
      */
     public static final Set<URL> PROVIDER_URL_SET = new HashSet<>();
+    /**
+     * 服务端序列化策略
+     */
+    public static SerializeFactory SERVER_SERIALIZE_FACTORY;
 }

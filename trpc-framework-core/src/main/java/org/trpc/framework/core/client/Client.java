@@ -24,6 +24,8 @@ import org.trpc.framework.core.registry.URL;
 import org.trpc.framework.core.registry.zookeeper.ZookeeperRegister;
 import org.trpc.framework.core.router.RandomRouterImpl;
 import org.trpc.framework.core.router.RotateRouterImpl;
+import org.trpc.framework.core.serialize.fastjson.FastJsonSerializeFactory;
+import org.trpc.framework.core.serialize.jdk.JDKSerializeFactory;
 import org.trpc.framework.interfaces.DataService;
 
 import java.util.List;
@@ -146,8 +148,7 @@ public class Client {
                 try {
                     //阻塞模式
                     RpcInvocation data = SEND_QUEUE.take();
-                    String json = JSON.toJSONString(data);
-                    RpcProtocol rpcProtocol = new RpcProtocol(json.getBytes());
+                    RpcProtocol rpcProtocol = new RpcProtocol(CLIENT_SERIALIZE_FACTORY.serialize(data));
                     ChannelFuture channelFuture = ConnectionHandler.getChannelFuture(data.getTargetServiceName());
                     channelFuture.channel().writeAndFlush(rpcProtocol);
                 } catch (Exception e) {
@@ -166,6 +167,18 @@ public class Client {
             IROUTER = new RotateRouterImpl();
         } else {
             throw new RuntimeException("不支持的路由层负载均衡策略: " + routerStrategy);
+        }
+        // 初始化序列化策略
+        String clientSerialize = clientConfig.getClientSerialize();
+        switch (clientSerialize) {
+            case JDK_SERIALIZE:
+                CLIENT_SERIALIZE_FACTORY = new JDKSerializeFactory();
+                break;
+            case FAST_JSON_SERIALIZE:
+                CLIENT_SERIALIZE_FACTORY = new FastJsonSerializeFactory();
+                break;
+            default:
+                throw new RuntimeException("不支持的序列化策略: " + clientSerialize);
         }
     }
 
