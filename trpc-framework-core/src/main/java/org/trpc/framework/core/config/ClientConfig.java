@@ -13,6 +13,8 @@ public class ClientConfig {
 
     private String proxyType;
 
+    private String routerStrategy;
+
     public String getProxyType() {
         return proxyType;
     }
@@ -35,5 +37,13 @@ public class ClientConfig {
 
     public void setApplicationName(String applicationName) {
         this.applicationName = applicationName;
+    }
+
+    public String getRouterStrategy() {
+        return routerStrategy;
+    }
+
+    public void setRouterStrategy(String routerStrategy) {
+        this.routerStrategy = routerStrategy;
     }
 }

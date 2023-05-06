@@ -1,9 +1,11 @@
 package org.trpc.framework.core.registry.zookeeper;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.trpc.framework.core.common.event.TRpcEvent;
 import org.trpc.framework.core.common.event.TRpcListenerLoader;
+import org.trpc.framework.core.common.event.TRpcNodeChangeEvent;
 import org.trpc.framework.core.common.event.TRpcUpdateEvent;
 import org.trpc.framework.core.common.event.data.URLChangeWrapper;
 import org.trpc.framework.core.registry.AbstractRegister;
@@ -76,8 +78,35 @@ public class ZookeeperRegister extends AbstractRegister implements RegistryServi
     @Override
     public void doAfterSubscribe(URL url) {
         //监听是否有新的服务注册
-        String newServerNodePath = ROOT + "/" + url.getServiceName() + "/provider";
+        //String newServerNodePath = ROOT + "/" + url.getServiceName() + "/provider";
+        //watchChildNodeData(newServerNodePath);
+
+        //监听是否有新的服务注册
+        String servicePath = url.getParams().get("servicePath");
+        String newServerNodePath = ROOT + "/" + servicePath;
         watchChildNodeData(newServerNodePath);
+        String providerIpStrJson = url.getParams().get("providerIps");
+        List<String> providerIpList = JSON.parseObject(providerIpStrJson, List.class);
+        for (String providerIp : providerIpList) {
+            this.watchNodeDataChange(ROOT + "/" + servicePath + "/" + providerIp);
+        }
+    }
+
+    /**
+     * 订阅服务节点内部的数据变化
+     *
+     * @param newServerNodePath
+     */
+    public void watchNodeDataChange(String newServerNodePath) {
+        zkClient.watchNodeData(newServerNodePath, watchedEvent -> {
+            String path = watchedEvent.getPath();
+            String nodeData = zkClient.getNodeData(path);
+            nodeData = nodeData.replace(";","/");
+            ProviderNodeInfo providerNodeInfo = URL.buildURLFromUrlStr(nodeData);
+            TRpcEvent iRpcEvent = new TRpcNodeChangeEvent(providerNodeInfo);
+            TRpcListenerLoader.sendEvent(iRpcEvent);
+            watchNodeDataChange(newServerNodePath);
+        });
     }
 
     public void watchChildNodeData(String newServerNodePath){

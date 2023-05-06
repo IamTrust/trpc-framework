@@ -22,12 +22,14 @@ import org.trpc.framework.core.proxy.jdk.JDKProxyFactory;
 import org.trpc.framework.core.registry.AbstractRegister;
 import org.trpc.framework.core.registry.URL;
 import org.trpc.framework.core.registry.zookeeper.ZookeeperRegister;
+import org.trpc.framework.core.router.RandomRouterImpl;
+import org.trpc.framework.core.router.RotateRouterImpl;
 import org.trpc.framework.interfaces.DataService;
 
 import java.util.List;
 
-import static org.trpc.framework.core.cache.CommonClientCache.SEND_QUEUE;
-import static org.trpc.framework.core.cache.CommonClientCache.SUBSCRIBE_SERVICE_LIST;
+import static org.trpc.framework.core.cache.CommonClientCache.*;
+import static org.trpc.framework.core.constant.RpcConstants.*;
 
 /**
  * 测试用远程调用客户端
@@ -74,12 +76,14 @@ public class Client {
         iRpcListenerLoader.init();
         this.clientConfig = PropertiesBootstrap.loadClientConfigFromLocal();
         RpcReference rpcReference;
-        if ("javassist".equals(clientConfig.getProxyType())) {
+        if (JAVASSIST_PROXY_TYPE.equals(clientConfig.getProxyType())) {
             // TODO 实现 Javassist 动态代理
             //rpcReference = new RpcReference(new JavassistProxyFactory());
             throw new RuntimeException("Javaassist 动态代理未实现, 请使用 JDK 动态代理!");
-        } else {
+        } else if (JDK_PROXY_TYPE.equals(clientConfig.getProxyType())) {
             rpcReference = new RpcReference(new JDKProxyFactory());
+        } else {
+            throw new RuntimeException("不支持的动态代理类型: " + clientConfig.getProxyType());
         }
         return rpcReference;
     }
@@ -104,17 +108,18 @@ public class Client {
      * 开始和各个provider建立连接
      */
     public void doConnectServer() {
-        for (String providerServiceName : SUBSCRIBE_SERVICE_LIST) {
-            List<String> providerIps = abstractRegister.getProviderIps(providerServiceName);
+        for (URL providerURL : SUBSCRIBE_SERVICE_LIST) {
+            List<String> providerIps = abstractRegister.getProviderIps(providerURL.getServiceName());
             for (String providerIp : providerIps) {
                 try {
-                    ConnectionHandler.connect(providerServiceName, providerIp);
+                    ConnectionHandler.connect(providerURL.getServiceName(), providerIp);
                 } catch (InterruptedException e) {
                     logger.error("[doConnectServer] connect fail ", e);
                 }
             }
             URL url = new URL();
-            url.setServiceName(providerServiceName);
+            url.addParam("servicePath",providerURL.getServiceName()+"/provider");
+            url.addParam("providerIps", JSON.toJSONString(providerIps));
             abstractRegister.doAfterSubscribe(url);
         }
     }
@@ -152,10 +157,23 @@ public class Client {
         }
     }
 
+    public void initClientConfig() {
+        // 初始化路由负载均衡策略
+        String routerStrategy = clientConfig.getRouterStrategy();
+        if (routerStrategy.equals(RANDOM_ROUTER_TYPE)) {
+            IROUTER = new RandomRouterImpl();
+        } else if (routerStrategy.equals(ROTATE_ROUTER_TYPE)) {
+            IROUTER = new RotateRouterImpl();
+        } else {
+            throw new RuntimeException("不支持的路由层负载均衡策略: " + routerStrategy);
+        }
+    }
+
 
     public static void main(String[] args) throws Throwable {
         Client client = new Client();
         RpcReference rpcReference = client.initClientApplication();
+        client.initClientConfig();
         DataService dataService = rpcReference.get(DataService.class);
         client.doSubscribeService(DataService.class);
         ConnectionHandler.setBootstrap(client.getBootstrap());
