@@ -1,6 +1,7 @@
 package org.trpc.framework.core.common.cache;
 
 import org.trpc.framework.core.config.ServerConfig;
+import org.trpc.framework.core.dispatcher.ServerChannelDispatcher;
 import org.trpc.framework.core.registry.URL;
 import org.trpc.framework.core.serialize.SerializeFactory;
 import org.trpc.framework.core.server.ServerFilterChain;
@@ -40,4 +41,6 @@ public class CommonServerCache {
     public static ServerConfig SERVER_CONFIG;
 
     public static final Map<String, ServiceWrapper> PROVIDER_SERVICE_WRAPPER_MAP = new ConcurrentHashMap<>();
+
+    public static final ServerChannelDispatcher SERVER_CHANNEL_DISPATCHER = new ServerChannelDispatcher();
 }

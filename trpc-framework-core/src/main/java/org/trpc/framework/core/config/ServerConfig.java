@@ -15,6 +15,10 @@ public class ServerConfig {
 
     private String serverSerialize;
 
+    private Integer blockingQueueLength;
+
+    private Integer businessThreadNum;
+
     public String getRegisterAddr() {
         return registerAddr;
     }
@@ -45,5 +49,21 @@ public class ServerConfig {
 
     public void setServerSerialize(String serverSerialize) {
         this.serverSerialize = serverSerialize;
+    }
+
+    public Integer getBlockingQueueLength() {
+        return blockingQueueLength;
+    }
+
+    public void setBlockingQueueLength(Integer blockingQueueLength) {
+        this.blockingQueueLength = blockingQueueLength;
+    }
+
+    public Integer getBusinessThreadNum() {
+        return businessThreadNum;
+    }
+
+    public void setBusinessThreadNum(Integer businessThreadNum) {
+        this.businessThreadNum = businessThreadNum;
     }
 }

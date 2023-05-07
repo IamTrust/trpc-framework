@@ -19,6 +19,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         RpcProtocol rpcProtocol = (RpcProtocol) msg;
         byte[] reqContent = rpcProtocol.getContent();
         String json = new String(reqContent,0,reqContent.length);
+        // TODO 这里的反序列化应该也要用序列化层来做
         RpcInvocation rpcInvocation = JSON.parseObject(json,RpcInvocation.class);
         if(!RESP_MAP.containsKey(rpcInvocation.getUuid())){
             throw new IllegalArgumentException("server response is error!");

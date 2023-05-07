@@ -79,6 +79,8 @@ public class Server {
             }
         });
         this.batchExportUrl();
+        // 开始接收并处理请求
+        SERVER_CHANNEL_DISPATCHER.startDataConsume();
         bootstrap.bind(serverConfig.getServerPort()).sync();
     }
 
@@ -86,6 +88,8 @@ public class Server {
         ServerConfig serverConfig = PropertiesBootstrap.loadServerConfigFromLocal();
         this.setServerConfig(serverConfig);
         SERVER_CONFIG = this.serverConfig;
+        // 线程池配置
+        SERVER_CHANNEL_DISPATCHER.init(SERVER_CONFIG.getBlockingQueueLength(), SERVER_CONFIG.getBusinessThreadNum());
         // 序列化策略, 采用 SPI 进行加载
         String serverSerialize = serverConfig.getServerSerialize();
         try {

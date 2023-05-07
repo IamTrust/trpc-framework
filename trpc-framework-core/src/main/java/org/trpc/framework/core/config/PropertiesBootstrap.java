@@ -13,6 +13,8 @@ public class PropertiesBootstrap {
     public static final String CLIENT_SERIALIZE = "trpc.clientSerialize";
     public static final String SERVER_SERIALIZE = "trpc.serverSerialize";
     public static final String REGISTRY_TYPE = "trpc.registry";
+    public static final String BUSINESS_THREAD_NUM = "trpc.business.thread.num";
+    public static final String BLOCKING_QUEUE_LENGTH = "trpc.blocking.queue.length";
 
     public static ServerConfig loadServerConfigFromLocal() {
         try {
@@ -25,6 +27,8 @@ public class PropertiesBootstrap {
         serverConfig.setApplicationName(PropertiesLoader.getPropertiesStr(APPLICATION_NAME));
         serverConfig.setRegisterAddr(PropertiesLoader.getPropertiesStr(REGISTER_ADDRESS));
         serverConfig.setServerSerialize(PropertiesLoader.getPropertiesStr(SERVER_SERIALIZE));
+        serverConfig.setBusinessThreadNum(PropertiesLoader.getPropertiesInteger(BUSINESS_THREAD_NUM));
+        serverConfig.setBlockingQueueLength(PropertiesLoader.getPropertiesInteger(BLOCKING_QUEUE_LENGTH));
         return serverConfig;
     }
 
