@@ -8,6 +8,7 @@ import org.trpc.framework.core.common.RpcInvocation;
 import org.trpc.framework.core.registry.URL;
 import org.trpc.framework.core.router.IRouter;
 import org.trpc.framework.core.serialize.SerializeFactory;
+import org.trpc.framework.core.spi.ExtensionLoader;
 
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -41,4 +42,6 @@ public class CommonClientCache {
     public static SerializeFactory CLIENT_SERIALIZE_FACTORY;
     //客户端过滤器链
     public static ClientFilterChain CLIENT_FILTER_CHAIN;
+    // SPI加载器
+    public static final ExtensionLoader EXTENSION_LOADER = new ExtensionLoader();
 }

@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.trpc.framework.core.common.cache.CommonClientCache.CLIENT_CONFIG;
+
 /**
  * 采用 Zookeeper 实现服务注册
  *
@@ -35,6 +37,10 @@ public class ZookeeperRegister extends AbstractRegister implements RegistryServi
     private String getConsumerPath(URL url) {
         return ROOT + "/" + url.getServiceName() + "/consumer/"
                 + url.getApplicationName() + ":" + url.getParams().get("host")+":";
+    }
+
+    public ZookeeperRegister() {
+        this(CLIENT_CONFIG.getRegisterAddr());
     }
 
     public ZookeeperRegister(String address) {

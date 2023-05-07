@@ -13,20 +13,30 @@ import org.trpc.framework.core.common.event.TRpcListenerLoader;
 import org.trpc.framework.core.common.util.CommonUtils;
 import org.trpc.framework.core.config.PropertiesBootstrap;
 import org.trpc.framework.core.config.ServerConfig;
+import org.trpc.framework.core.filter.IServerFilter;
 import org.trpc.framework.core.filter.server.LogFilterImpl;
 import org.trpc.framework.core.filter.server.TokenFilterImpl;
 import org.trpc.framework.core.registry.RegistryService;
 import org.trpc.framework.core.registry.URL;
 import org.trpc.framework.core.registry.zookeeper.ZookeeperRegister;
+import org.trpc.framework.core.serialize.SerializeFactory;
 import org.trpc.framework.core.serialize.fastjson.FastJsonSerializeFactory;
 import org.trpc.framework.core.serialize.jdk.JDKSerializeFactory;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import static org.trpc.framework.core.common.cache.CommonClientCache.CLIENT_SERIALIZE_FACTORY;
+import static org.trpc.framework.core.common.cache.CommonClientCache.EXTENSION_LOADER;
 import static org.trpc.framework.core.common.cache.CommonServerCache.*;
 import static org.trpc.framework.core.common.constant.RpcConstants.FAST_JSON_SERIALIZE;
 import static org.trpc.framework.core.common.constant.RpcConstants.JDK_SERIALIZE;
+import static org.trpc.framework.core.spi.ExtensionLoader.EXTENSION_LOADER_CLASS_CACHE;
 
 /**
- * 测试用远程调用服务端
+ * 远程调用服务端
+ *
+ * @author Trust会长
  */
 public class Server {
     private static EventLoopGroup bossGroup = null;
@@ -76,22 +86,28 @@ public class Server {
         ServerConfig serverConfig = PropertiesBootstrap.loadServerConfigFromLocal();
         this.setServerConfig(serverConfig);
         SERVER_CONFIG = this.serverConfig;
-        // 序列化策略
+        // 序列化策略, 采用 SPI 进行加载
         String serverSerialize = serverConfig.getServerSerialize();
-        switch (serverSerialize) {
-            case JDK_SERIALIZE:
-                SERVER_SERIALIZE_FACTORY = new JDKSerializeFactory();
-                break;
-            case FAST_JSON_SERIALIZE:
-                SERVER_SERIALIZE_FACTORY = new FastJsonSerializeFactory();
-                break;
-            default:
-                throw new RuntimeException("不支持的序列化策略: " + serverSerialize);
+        try {
+            EXTENSION_LOADER.loadExtension(SerializeFactory.class);
+            LinkedHashMap<String, Class> serializeMap = EXTENSION_LOADER_CLASS_CACHE.get(SerializeFactory.class.getName());
+            Class serializeClass = serializeMap.get(serverSerialize);
+            SERVER_SERIALIZE_FACTORY = (SerializeFactory) serializeClass.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("serializeType unknown, error is ", e);
         }
-        // 初始化过滤器链, 目前是硬编码, TODO 改进成通过配置文件初始化
+        // 初始化过滤器链, 通过 SPI 加载
         SERVER_FILTER_CHAIN = new ServerFilterChain();
-        SERVER_FILTER_CHAIN.addServerFilter(new LogFilterImpl());
-        SERVER_FILTER_CHAIN.addServerFilter(new TokenFilterImpl());
+        try {
+            EXTENSION_LOADER.loadExtension(IServerFilter.class);
+            LinkedHashMap<String, Class> serverFilterMap = EXTENSION_LOADER_CLASS_CACHE.get(IServerFilter.class.getName());
+            for (Map.Entry<String, Class> entry : serverFilterMap.entrySet()) {
+                Class serverFilterClass = entry.getValue();
+                SERVER_FILTER_CHAIN.addServerFilter((IServerFilter) serverFilterClass.newInstance());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("server filter unknown, error is ", e);
+        }
     }
 
     /**

@@ -18,27 +18,36 @@ import org.trpc.framework.core.common.event.TRpcListenerLoader;
 import org.trpc.framework.core.common.util.CommonUtils;
 import org.trpc.framework.core.config.ClientConfig;
 import org.trpc.framework.core.config.PropertiesBootstrap;
+import org.trpc.framework.core.filter.IClientFilter;
 import org.trpc.framework.core.filter.client.DirectInvokeFilterImpl;
 import org.trpc.framework.core.filter.client.GroupFilterImpl;
 import org.trpc.framework.core.filter.client.LogFilterImpl;
+import org.trpc.framework.core.proxy.ProxyFactory;
 import org.trpc.framework.core.proxy.jdk.JDKProxyFactory;
 import org.trpc.framework.core.registry.AbstractRegister;
+import org.trpc.framework.core.registry.RegistryService;
 import org.trpc.framework.core.registry.URL;
-import org.trpc.framework.core.registry.zookeeper.ZookeeperRegister;
+import org.trpc.framework.core.router.IRouter;
 import org.trpc.framework.core.router.RandomRouterImpl;
 import org.trpc.framework.core.router.RotateRouterImpl;
+import org.trpc.framework.core.serialize.SerializeFactory;
 import org.trpc.framework.core.serialize.fastjson.FastJsonSerializeFactory;
 import org.trpc.framework.core.serialize.jdk.JDKSerializeFactory;
 import org.trpc.framework.interfaces.DataService;
 
+import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.trpc.framework.core.common.cache.CommonClientCache.*;
 import static org.trpc.framework.core.common.constant.RpcConstants.*;
+import static org.trpc.framework.core.spi.ExtensionLoader.EXTENSION_LOADER_CLASS_CACHE;
 
 /**
- * 测试用远程调用客户端
+ * 远程调用客户端
+ *
+ * @author Trust会长
  */
 public class Client {
     private Logger logger = LoggerFactory.getLogger(Client.class);
@@ -83,26 +92,35 @@ public class Client {
         this.clientConfig = PropertiesBootstrap.loadClientConfigFromLocal();
         CLIENT_CONFIG = this.clientConfig;
         RpcReference rpcReference;
-        if (JAVASSIST_PROXY_TYPE.equals(clientConfig.getProxyType())) {
-            // TODO 实现 Javassist 动态代理
-            //rpcReference = new RpcReference(new JavassistProxyFactory());
-            throw new RuntimeException("Javaassist 动态代理未实现, 请使用 JDK 动态代理!");
-        } else if (JDK_PROXY_TYPE.equals(clientConfig.getProxyType())) {
-            rpcReference = new RpcReference(new JDKProxyFactory());
-        } else {
-            throw new RuntimeException("不支持的动态代理类型: " + clientConfig.getProxyType());
+        //使用自定义SPI机制去加载动态代理的配置
+        try {
+            EXTENSION_LOADER.loadExtension(ProxyFactory.class);
+            LinkedHashMap<String, Class> proxyMap = EXTENSION_LOADER_CLASS_CACHE.get(ProxyFactory.class.getName());
+            Class proxyClass = proxyMap.get(clientConfig.getProxyType());
+            rpcReference = new RpcReference((ProxyFactory)proxyClass.newInstance());
+        } catch (Exception e) {
+            throw new RuntimeException("proxyType unknown, error is ", e);
         }
         return rpcReference;
     }
 
     /**
-     * 启动服务之前需要预先订阅对应的dubbo服务
+     * 启动服务之前需要预先订阅对应的注册中心中的服务
      *
      * @param serviceBean
      */
     public void doSubscribeService(Class serviceBean) {
         if (abstractRegister == null) {
-            abstractRegister = new ZookeeperRegister(clientConfig.getRegisterAddr());
+            try {
+                //使用自定义的SPI机制去加载注册中心的配置
+                EXTENSION_LOADER.loadExtension(RegistryService.class);
+                Map<String, Class> registerMap = EXTENSION_LOADER_CLASS_CACHE.get(RegistryService.class.getName());
+                Class registerClass =  registerMap.get(clientConfig.getRegistryType());
+                //真正实例化对象的位置
+                abstractRegister = (AbstractRegister) registerClass.newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException("registryServiceType unknown, error is ", e);
+            }
         }
         URL url = new URL();
         url.setApplicationName(clientConfig.getApplicationName());
@@ -168,34 +186,40 @@ public class Client {
     }
 
     public void initClientConfig() {
-        // 初始化路由负载均衡策略
+        // 初始化路由负载均衡策略, 采用 SPI 进行加载
         String routerStrategy = clientConfig.getRouterStrategy();
-        if (routerStrategy.equals(RANDOM_ROUTER_TYPE)) {
-            IROUTER = new RandomRouterImpl();
-        } else if (routerStrategy.equals(ROTATE_ROUTER_TYPE)) {
-            IROUTER = new RotateRouterImpl();
-        } else {
-            throw new RuntimeException("不支持的路由层负载均衡策略: " + routerStrategy);
+        try {
+            EXTENSION_LOADER.loadExtension(IRouter.class);
+            LinkedHashMap<String, Class> routerMap = EXTENSION_LOADER_CLASS_CACHE.get(IRouter.class.getName());
+            Class routerClass = routerMap.get(routerStrategy);
+            IROUTER = (IRouter) routerClass.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("routerStrategy unknown, error is ", e);
         }
-        // 初始化序列化策略
+        // 初始化序列化策略, 采用 SPI 进行加载
         String clientSerialize = clientConfig.getClientSerialize();
-        switch (clientSerialize) {
-            case JDK_SERIALIZE:
-                CLIENT_SERIALIZE_FACTORY = new JDKSerializeFactory();
-                break;
-            case FAST_JSON_SERIALIZE:
-                CLIENT_SERIALIZE_FACTORY = new FastJsonSerializeFactory();
-                break;
-            default:
-                throw new RuntimeException("不支持的序列化策略: " + clientSerialize);
+        try {
+            EXTENSION_LOADER.loadExtension(SerializeFactory.class);
+            LinkedHashMap<String, Class> serializeMap = EXTENSION_LOADER_CLASS_CACHE.get(SerializeFactory.class.getName());
+            Class serializeClass = serializeMap.get(clientSerialize);
+            CLIENT_SERIALIZE_FACTORY = (SerializeFactory) serializeClass.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("serializeType unknown, error is ", e);
         }
-        // 初始化过滤器链, 目前是硬编码方式, TODO 改进成通过配置文件初始化
+        // 初始化过滤器链, 采用 SPI 进行加载
         CLIENT_FILTER_CHAIN = new ClientFilterChain();
-        CLIENT_FILTER_CHAIN.addClientFilter(new DirectInvokeFilterImpl());
-        CLIENT_FILTER_CHAIN.addClientFilter(new GroupFilterImpl());
-        CLIENT_FILTER_CHAIN.addClientFilter(new LogFilterImpl());
+        try {
+            EXTENSION_LOADER.loadExtension(IClientFilter.class);
+            LinkedHashMap<String, Class> clientFilterMap = EXTENSION_LOADER_CLASS_CACHE.get(IClientFilter.class.getName());
+            // 遍历 clientFilterMap , 将其中所有 clientFilter 加入 CLIENT_FILTER_CHAIN
+            for (Map.Entry<String, Class> entry : clientFilterMap.entrySet()) {
+                Class clientFilterClass = entry.getValue();
+                CLIENT_FILTER_CHAIN.addClientFilter((IClientFilter) clientFilterClass.newInstance());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("client filter unknown, error is ", e);
+        }
     }
-
 
     public static void main(String[] args) throws Throwable {
         Client client = new Client();

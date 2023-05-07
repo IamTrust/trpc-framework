@@ -17,6 +17,8 @@ public class ClientConfig {
 
     private String clientSerialize;
 
+    private String registryType;
+
     public String getProxyType() {
         return proxyType;
     }
@@ -55,5 +57,13 @@ public class ClientConfig {
 
     public void setClientSerialize(String clientSerialize) {
         this.clientSerialize = clientSerialize;
+    }
+
+    public String getRegistryType() {
+        return registryType;
+    }
+
+    public void setRegistryType(String registryType) {
+        this.registryType = registryType;
     }
 }

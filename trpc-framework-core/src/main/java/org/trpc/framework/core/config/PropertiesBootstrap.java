@@ -12,6 +12,7 @@ public class PropertiesBootstrap {
     public static final String ROUTER_STRATEGY = "trpc.routerStrategy";
     public static final String CLIENT_SERIALIZE = "trpc.clientSerialize";
     public static final String SERVER_SERIALIZE = "trpc.serverSerialize";
+    public static final String REGISTRY_TYPE = "trpc.registry";
 
     public static ServerConfig loadServerConfigFromLocal() {
         try {
@@ -39,6 +40,7 @@ public class PropertiesBootstrap {
         clientConfig.setProxyType(PropertiesLoader.getPropertiesStr(PROXY_TYPE));
         clientConfig.setRouterStrategy(PropertiesLoader.getPropertiesStr(ROUTER_STRATEGY));
         clientConfig.setClientSerialize(PropertiesLoader.getPropertiesStr(CLIENT_SERIALIZE));
+        clientConfig.setRegistryType(PropertiesLoader.getPropertiesStr(REGISTRY_TYPE));
         return clientConfig;
     }
 

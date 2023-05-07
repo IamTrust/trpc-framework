@@ -1,0 +1,2 @@
+log=org.trpc.framework.core.filter.server.LogFilterImpl
+token=org.trpc.framework.core.filter.server.TokenFilterImpl
