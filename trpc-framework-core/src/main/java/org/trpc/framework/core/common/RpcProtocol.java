@@ -2,7 +2,7 @@ package org.trpc.framework.core.common;
 
 import java.io.Serializable;
 
-import static org.trpc.framework.core.constant.RpcConstants.MAGIC_NUMBER;
+import static org.trpc.framework.core.common.constant.RpcConstants.MAGIC_NUMBER;
 
 /**
  * 数据协议

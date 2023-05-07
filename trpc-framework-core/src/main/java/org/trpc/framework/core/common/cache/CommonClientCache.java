@@ -1,5 +1,6 @@
-package org.trpc.framework.core.cache;
+package org.trpc.framework.core.common.cache;
 
+import org.trpc.framework.core.client.ClientFilterChain;
 import org.trpc.framework.core.common.ChannelFuturePollingRef;
 import org.trpc.framework.core.config.ClientConfig;
 import org.trpc.framework.core.common.ChannelFutureWrapper;
@@ -27,15 +28,17 @@ public class CommonClientCache {
     //服务列表
     public static List<URL> SUBSCRIBE_SERVICE_LIST = new ArrayList<>();
     //Key为服务名，Value为该服务的URL，可能有多个(集群)
-    public static Map<String, List<URL>> URL_MAP = new ConcurrentHashMap<>();
+    public static Map<String, Map<String, String>> URL_MAP = new ConcurrentHashMap<>();
     public static Set<String> SERVER_ADDRESS = new HashSet<>();
     //每次进行远程调用的时候都是从这里面去选择服务提供者
     public static Map<String, List<ChannelFutureWrapper>> CONNECT_MAP = new ConcurrentHashMap<>();
     //随机请求的map
     public static Map<String, ChannelFutureWrapper[]> SERVICE_ROUTER_MAP = new ConcurrentHashMap<>();
     public static ChannelFuturePollingRef CHANNEL_FUTURE_POLLING_REF = new ChannelFuturePollingRef();
-    // 路由层所用负载均衡策略
+    //路由层所用负载均衡策略
     public static IRouter IROUTER;
-    // 序列化层所用序列化技术
+    //序列化层所用序列化技术
     public static SerializeFactory CLIENT_SERIALIZE_FACTORY;
+    //客户端过滤器链
+    public static ClientFilterChain CLIENT_FILTER_CHAIN;
 }

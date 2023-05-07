@@ -9,18 +9,21 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.trpc.framework.core.common.RpcDecoder;
 import org.trpc.framework.core.common.RpcEncoder;
+import org.trpc.framework.core.common.event.TRpcListenerLoader;
 import org.trpc.framework.core.common.util.CommonUtils;
 import org.trpc.framework.core.config.PropertiesBootstrap;
 import org.trpc.framework.core.config.ServerConfig;
+import org.trpc.framework.core.filter.server.LogFilterImpl;
+import org.trpc.framework.core.filter.server.TokenFilterImpl;
 import org.trpc.framework.core.registry.RegistryService;
 import org.trpc.framework.core.registry.URL;
 import org.trpc.framework.core.registry.zookeeper.ZookeeperRegister;
 import org.trpc.framework.core.serialize.fastjson.FastJsonSerializeFactory;
 import org.trpc.framework.core.serialize.jdk.JDKSerializeFactory;
 
-import static org.trpc.framework.core.cache.CommonServerCache.*;
-import static org.trpc.framework.core.constant.RpcConstants.FAST_JSON_SERIALIZE;
-import static org.trpc.framework.core.constant.RpcConstants.JDK_SERIALIZE;
+import static org.trpc.framework.core.common.cache.CommonServerCache.*;
+import static org.trpc.framework.core.common.constant.RpcConstants.FAST_JSON_SERIALIZE;
+import static org.trpc.framework.core.common.constant.RpcConstants.JDK_SERIALIZE;
 
 /**
  * 测试用远程调用服务端
@@ -33,6 +36,8 @@ public class Server {
     private ServerConfig serverConfig;
 
     private RegistryService registryService;
+
+    private static TRpcListenerLoader tRpcListenerLoader;
 
     public ServerConfig getServerConfig() {
         return serverConfig;
@@ -70,6 +75,7 @@ public class Server {
     public void initServerConfig() {
         ServerConfig serverConfig = PropertiesBootstrap.loadServerConfigFromLocal();
         this.setServerConfig(serverConfig);
+        SERVER_CONFIG = this.serverConfig;
         // 序列化策略
         String serverSerialize = serverConfig.getServerSerialize();
         switch (serverSerialize) {
@@ -82,14 +88,19 @@ public class Server {
             default:
                 throw new RuntimeException("不支持的序列化策略: " + serverSerialize);
         }
+        // 初始化过滤器链, 目前是硬编码, TODO 改进成通过配置文件初始化
+        SERVER_FILTER_CHAIN = new ServerFilterChain();
+        SERVER_FILTER_CHAIN.addServerFilter(new LogFilterImpl());
+        SERVER_FILTER_CHAIN.addServerFilter(new TokenFilterImpl());
     }
 
     /**
      * 暴露服务信息
      *
-     * @param serviceBean
+     * @param serviceWrapper
      */
-    public void exportService(Object serviceBean) {
+    public void exportService(ServiceWrapper serviceWrapper) {
+        Object serviceBean = serviceWrapper.getServiceObj();
         if (serviceBean.getClass().getInterfaces().length == 0) {
             throw new RuntimeException("service must had interfaces!");
         }
@@ -108,7 +119,12 @@ public class Server {
         url.setApplicationName(serverConfig.getApplicationName());
         url.addParam("host", CommonUtils.getIpAddress());
         url.addParam("port", String.valueOf(serverConfig.getServerPort()));
+        url.addParam("group", serviceWrapper.getGroup());
+        url.addParam("limit", String.valueOf(serviceWrapper.getLimit()));
         PROVIDER_URL_SET.add(url);
+        if (CommonUtils.isNotEmpty(serviceWrapper.getServiceToken())) {
+            PROVIDER_SERVICE_WRAPPER_MAP.put(interfaceClass.getName(), serviceWrapper);
+        }
     }
 
     public void batchExportUrl(){
@@ -130,9 +146,20 @@ public class Server {
 
 
     public static void main(String[] args) throws InterruptedException {
+        //Server server = new Server();
+        //server.initServerConfig();
+        //server.exportService(new DataServiceImpl());
+        //server.startApplication();
+        // 引入了分组和 Token 鉴权, 因此服务需要设置更多信息
         Server server = new Server();
         server.initServerConfig();
-        server.exportService(new DataServiceImpl());
+        tRpcListenerLoader = new TRpcListenerLoader();
+        tRpcListenerLoader.init();
+        ServiceWrapper dataServiceServiceWrapper = new ServiceWrapper(new DataServiceImpl(), "dev");
+        dataServiceServiceWrapper.setServiceToken("token-a");
+        dataServiceServiceWrapper.setLimit(2);
+        server.exportService(dataServiceServiceWrapper);
+        ApplicationShutdownHook.registryShutdownHook();
         server.startApplication();
     }
 }

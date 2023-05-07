@@ -8,7 +8,7 @@ import io.netty.util.ReferenceCountUtil;
 import org.trpc.framework.core.common.RpcInvocation;
 import org.trpc.framework.core.common.RpcProtocol;
 
-import static org.trpc.framework.core.cache.CommonClientCache.RESP_MAP;
+import static org.trpc.framework.core.common.cache.CommonClientCache.RESP_MAP;
 
 /**
  * 客户端收到响应的处理

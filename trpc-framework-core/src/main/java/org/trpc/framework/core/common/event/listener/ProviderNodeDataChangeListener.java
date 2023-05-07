@@ -8,8 +8,8 @@ import org.trpc.framework.core.registry.zookeeper.ProviderNodeInfo;
 
 import java.util.List;
 
-import static org.trpc.framework.core.cache.CommonClientCache.CONNECT_MAP;
-import static org.trpc.framework.core.cache.CommonClientCache.IROUTER;
+import static org.trpc.framework.core.common.cache.CommonClientCache.CONNECT_MAP;
+import static org.trpc.framework.core.common.cache.CommonClientCache.IROUTER;
 
 /**
  * @author Trust会长

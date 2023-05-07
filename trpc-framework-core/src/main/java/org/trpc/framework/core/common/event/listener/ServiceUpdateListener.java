@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.trpc.framework.core.cache.CommonClientCache.CONNECT_MAP;
+import static org.trpc.framework.core.common.cache.CommonClientCache.CONNECT_MAP;
 
 public class ServiceUpdateListener implements TRpcListener<TRpcUpdateEvent> {
 

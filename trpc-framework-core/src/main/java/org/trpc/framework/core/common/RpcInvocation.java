@@ -1,6 +1,8 @@
 package org.trpc.framework.core.common;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 封装一次远程调用
@@ -9,16 +11,26 @@ import java.io.Serializable;
  * @Date 2023/4/20
  */
 public class RpcInvocation implements Serializable {
-    //请求的目标方法
+    // 请求的目标方法
     private String targetMethod;
-    //请求的目标服务名称
+    // 请求的目标服务名称
     private String targetServiceName;
-    //请求参数信息
+    // 请求参数信息
     private Object[] args;
     // 唯一标识
     private String uuid;
-    //接口响应的数据塞入这个字段中（如果是异步调用或者void类型，这里就为空）
+    // 接口响应的数据塞入这个字段中（如果是异步调用或者void类型，这里就为空）
     private Object response;
+    // 附加信息
+    private Map<String, Object> attachments = new ConcurrentHashMap<>();
+
+    public Map<String, Object> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(Map<String, Object> attachments) {
+        this.attachments = attachments;
+    }
 
     public String getTargetMethod() {
         return targetMethod;

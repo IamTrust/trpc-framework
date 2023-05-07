@@ -1,4 +1,4 @@
-package org.trpc.framework.core.constant;
+package org.trpc.framework.core.common.constant;
 
 /**
  * 常量

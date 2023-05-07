@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.trpc.framework.core.cache.CommonClientCache.*;
+import static org.trpc.framework.core.common.cache.CommonClientCache.*;
 
 /**
  * 随机选择服务策略

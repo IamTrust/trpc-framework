@@ -6,7 +6,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.util.List;
 
-import static org.trpc.framework.core.constant.RpcConstants.MAGIC_NUMBER;
+import static org.trpc.framework.core.common.constant.RpcConstants.MAGIC_NUMBER;
 
 /**
  * 反序列化

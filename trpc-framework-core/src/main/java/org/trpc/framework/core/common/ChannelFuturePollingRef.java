@@ -2,7 +2,7 @@ package org.trpc.framework.core.common;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.trpc.framework.core.cache.CommonClientCache.SERVICE_ROUTER_MAP;
+import static org.trpc.framework.core.common.cache.CommonClientCache.SERVICE_ROUTER_MAP;
 
 /**
  * 轮询

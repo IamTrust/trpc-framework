@@ -12,7 +12,9 @@ import org.trpc.framework.core.registry.AbstractRegister;
 import org.trpc.framework.core.registry.RegistryService;
 import org.trpc.framework.core.registry.URL;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 采用 Zookeeper 实现服务注册
@@ -136,6 +138,17 @@ public class ZookeeperRegister extends AbstractRegister implements RegistryServi
     @Override
     public List<String> getProviderIps(String serviceName) {
         return this.zkClient.getChildrenData(ROOT + "/" + serviceName + "/provider");
+    }
+
+    @Override
+    public Map<String, String> getServiceWeightMap(String serviceName) {
+        List<String> nodeDataList = this.zkClient.getChildrenData(ROOT + "/" + serviceName + "/provider");
+        Map<String, String> result = new HashMap<>();
+        for (String ipAndHost : nodeDataList) {
+            String childData = this.zkClient.getNodeData(ROOT + "/" + serviceName + "/provider/" + ipAndHost);
+            result.put(ipAndHost, childData);
+        }
+        return result;
     }
 
     @Override

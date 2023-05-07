@@ -7,6 +7,7 @@ package org.trpc.framework.core.registry.zookeeper;
  * @Date 2023/4/21
  */
 public class ProviderNodeInfo {
+    private String applicationName;
     private String serviceName;
 
     private String address;
@@ -14,6 +15,8 @@ public class ProviderNodeInfo {
     private Integer weight;
 
     private String registryTime;
+
+    private String group;
 
     public ProviderNodeInfo() {
     }
@@ -50,11 +53,31 @@ public class ProviderNodeInfo {
         this.registryTime = registryTime;
     }
 
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
+    public String getApplicationName() {
+        return applicationName;
+    }
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
+
     @Override
     public String toString() {
         return "ProviderNodeInfo{" +
-                "serviceName='" + serviceName + '\'' +
+                "applicationName='" + applicationName + '\'' +
+                ", serviceName='" + serviceName + '\'' +
                 ", address='" + address + '\'' +
+                ", weight=" + weight +
+                ", registryTime='" + registryTime + '\'' +
+                ", group='" + group + '\'' +
                 '}';
     }
 }

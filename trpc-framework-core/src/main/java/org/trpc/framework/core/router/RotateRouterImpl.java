@@ -5,7 +5,7 @@ import org.trpc.framework.core.registry.URL;
 
 import java.util.List;
 
-import static org.trpc.framework.core.cache.CommonClientCache.*;
+import static org.trpc.framework.core.common.cache.CommonClientCache.*;
 
 /**
  * 轮询策略

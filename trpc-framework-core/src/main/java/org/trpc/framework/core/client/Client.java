@@ -18,6 +18,9 @@ import org.trpc.framework.core.common.event.TRpcListenerLoader;
 import org.trpc.framework.core.common.util.CommonUtils;
 import org.trpc.framework.core.config.ClientConfig;
 import org.trpc.framework.core.config.PropertiesBootstrap;
+import org.trpc.framework.core.filter.client.DirectInvokeFilterImpl;
+import org.trpc.framework.core.filter.client.GroupFilterImpl;
+import org.trpc.framework.core.filter.client.LogFilterImpl;
 import org.trpc.framework.core.proxy.jdk.JDKProxyFactory;
 import org.trpc.framework.core.registry.AbstractRegister;
 import org.trpc.framework.core.registry.URL;
@@ -29,9 +32,10 @@ import org.trpc.framework.core.serialize.jdk.JDKSerializeFactory;
 import org.trpc.framework.interfaces.DataService;
 
 import java.util.List;
+import java.util.Map;
 
-import static org.trpc.framework.core.cache.CommonClientCache.*;
-import static org.trpc.framework.core.constant.RpcConstants.*;
+import static org.trpc.framework.core.common.cache.CommonClientCache.*;
+import static org.trpc.framework.core.common.constant.RpcConstants.*;
 
 /**
  * 测试用远程调用客户端
@@ -77,6 +81,7 @@ public class Client {
         iRpcListenerLoader = new TRpcListenerLoader();
         iRpcListenerLoader.init();
         this.clientConfig = PropertiesBootstrap.loadClientConfigFromLocal();
+        CLIENT_CONFIG = this.clientConfig;
         RpcReference rpcReference;
         if (JAVASSIST_PROXY_TYPE.equals(clientConfig.getProxyType())) {
             // TODO 实现 Javassist 动态代理
@@ -103,6 +108,8 @@ public class Client {
         url.setApplicationName(clientConfig.getApplicationName());
         url.setServiceName(serviceBean.getName());
         url.addParam("host", CommonUtils.getIpAddress());
+        Map<String, String> result = abstractRegister.getServiceWeightMap(serviceBean.getName());
+        URL_MAP.put(serviceBean.getName(), result);
         abstractRegister.subscribe(url);
     }
 
@@ -148,9 +155,11 @@ public class Client {
                 try {
                     //阻塞模式
                     RpcInvocation data = SEND_QUEUE.take();
-                    RpcProtocol rpcProtocol = new RpcProtocol(CLIENT_SERIALIZE_FACTORY.serialize(data));
-                    ChannelFuture channelFuture = ConnectionHandler.getChannelFuture(data.getTargetServiceName());
-                    channelFuture.channel().writeAndFlush(rpcProtocol);
+                    ChannelFuture channelFuture = ConnectionHandler.getChannelFuture(data);
+                    if (channelFuture != null) {
+                        RpcProtocol rpcProtocol = new RpcProtocol(CLIENT_SERIALIZE_FACTORY.serialize(data));
+                        channelFuture.channel().writeAndFlush(rpcProtocol);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -180,6 +189,11 @@ public class Client {
             default:
                 throw new RuntimeException("不支持的序列化策略: " + clientSerialize);
         }
+        // 初始化过滤器链, 目前是硬编码方式, TODO 改进成通过配置文件初始化
+        CLIENT_FILTER_CHAIN = new ClientFilterChain();
+        CLIENT_FILTER_CHAIN.addClientFilter(new DirectInvokeFilterImpl());
+        CLIENT_FILTER_CHAIN.addClientFilter(new GroupFilterImpl());
+        CLIENT_FILTER_CHAIN.addClientFilter(new LogFilterImpl());
     }
 
 
@@ -187,7 +201,12 @@ public class Client {
         Client client = new Client();
         RpcReference rpcReference = client.initClientApplication();
         client.initClientConfig();
-        DataService dataService = rpcReference.get(DataService.class);
+        // 引入了分组和 Token 鉴权, 因此服务需要设置更多信息
+        RpcReferenceWrapper<DataService> rpcReferenceWrapper = new RpcReferenceWrapper<>();
+        rpcReferenceWrapper.setGroup("dev");
+        rpcReferenceWrapper.setAimClass(DataService.class);
+        rpcReferenceWrapper.setServiceToken("token-a");
+        DataService dataService = rpcReference.get(rpcReferenceWrapper);
         client.doSubscribeService(DataService.class);
         ConnectionHandler.setBootstrap(client.getBootstrap());
         client.doConnectServer();

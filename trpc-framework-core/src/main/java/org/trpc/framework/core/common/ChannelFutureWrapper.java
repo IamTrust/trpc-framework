@@ -15,6 +15,8 @@ public class ChannelFutureWrapper {
 
     private Integer weight;
 
+    private String group; // 服务所属组
+
     public ChannelFutureWrapper() {
     }
 
@@ -54,6 +56,14 @@ public class ChannelFutureWrapper {
 
     public void setWeight(Integer weight) {
         this.weight = weight;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
     }
 
     @Override

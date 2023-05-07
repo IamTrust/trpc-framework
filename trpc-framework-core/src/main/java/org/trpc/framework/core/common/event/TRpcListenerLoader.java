@@ -12,12 +12,12 @@ import java.util.concurrent.Executors;
 
 public class TRpcListenerLoader {
 
-    private static List<TRpcListener> iRpcListenerList = new ArrayList<>();
+    private static List<TRpcListener> tRpcListenerList = new ArrayList<>();
 
     private static ExecutorService eventThreadPool = Executors.newFixedThreadPool(2);
 
     public static void registerListener(TRpcListener iRpcListener) {
-        iRpcListenerList.add(iRpcListener);
+        tRpcListenerList.add(iRpcListener);
     }
 
     public void init() {
@@ -40,10 +40,10 @@ public class TRpcListenerLoader {
     }
 
     public static void sendEvent(TRpcEvent tRpcEvent) {
-        if(CommonUtils.isEmptyList(iRpcListenerList)){
+        if(CommonUtils.isEmptyList(tRpcListenerList)){
             return;
         }
-        for (TRpcListener<?> tRpcListener : iRpcListenerList) {
+        for (TRpcListener<?> tRpcListener : tRpcListenerList) {
             Class<?> type = getInterfaceT(tRpcListener);
             if(type.equals(tRpcEvent.getClass())){
                 eventThreadPool.execute(new Runnable() {
@@ -56,6 +56,28 @@ public class TRpcListenerLoader {
                         }
                     }
                 });
+            }
+        }
+    }
+
+    /**
+     * 同步事件处理，可能会堵塞
+     *
+     * @param tRpcEvent
+     */
+    public static void sendSyncEvent(TRpcEvent tRpcEvent) {
+        System.out.println(tRpcListenerList);
+        if (CommonUtils.isEmptyList(tRpcListenerList)) {
+            return;
+        }
+        for (TRpcListener<?> tRpcListener : tRpcListenerList) {
+            Class<?> type = getInterfaceT(tRpcListener);
+            if (type.equals(tRpcEvent.getClass())) {
+                try {
+                    tRpcListener.callback(tRpcEvent.getData());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
