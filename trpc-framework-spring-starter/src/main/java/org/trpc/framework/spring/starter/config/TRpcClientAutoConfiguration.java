@@ -36,6 +36,7 @@ public class TRpcClientAutoConfiguration implements BeanPostProcessor, Applicati
                         LOGGER.error("[IRpcClientAutoConfiguration] postProcessAfterInitialization has error ",e);
                         throw new RuntimeException(e);
                     }
+                    client.initClientConfig();
                     hasInitClientConfig = true;
                 }
                 needInitClient = true;

@@ -142,9 +142,10 @@ public class Server {
         url.addParam("group", serviceWrapper.getGroup());
         url.addParam("limit", String.valueOf(serviceWrapper.getLimit()));
         PROVIDER_URL_SET.add(url);
-        if (CommonUtils.isNotEmpty(serviceWrapper.getServiceToken())) {
-            PROVIDER_SERVICE_WRAPPER_MAP.put(interfaceClass.getName(), serviceWrapper);
-        }
+        //if (CommonUtils.isNotEmpty(serviceWrapper.getServiceToken())) {
+        //    PROVIDER_SERVICE_WRAPPER_MAP.put(interfaceClass.getName(), serviceWrapper);
+        //}
+        PROVIDER_SERVICE_WRAPPER_MAP.put(interfaceClass.getName(), serviceWrapper);
     }
 
     public void batchExportUrl(){
