@@ -1,6 +1,10 @@
 package org.trpc.framework.core.config;
 
+import org.trpc.framework.core.common.util.CommonUtils;
+
 import java.io.IOException;
+
+import static org.trpc.framework.core.common.constant.RpcConstants.*;
 
 public class PropertiesBootstrap {
 
@@ -23,12 +27,36 @@ public class PropertiesBootstrap {
             throw new RuntimeException("loadServerConfigFromLocal fail,e is {}", e);
         }
         ServerConfig serverConfig = new ServerConfig();
-        serverConfig.setServerPort(PropertiesLoader.getPropertiesInteger(SERVER_PORT));
-        serverConfig.setApplicationName(PropertiesLoader.getPropertiesStr(APPLICATION_NAME));
-        serverConfig.setRegisterAddr(PropertiesLoader.getPropertiesStr(REGISTER_ADDRESS));
-        serverConfig.setServerSerialize(PropertiesLoader.getPropertiesStr(SERVER_SERIALIZE));
-        serverConfig.setBusinessThreadNum(PropertiesLoader.getPropertiesInteger(BUSINESS_THREAD_NUM));
-        serverConfig.setBlockingQueueLength(PropertiesLoader.getPropertiesInteger(BLOCKING_QUEUE_LENGTH));
+        serverConfig.setServerPort(
+                PropertiesLoader.getPropertiesInteger(SERVER_PORT) == null ?
+                        DEFAULT_PORT :
+                        PropertiesLoader.getPropertiesInteger(SERVER_PORT)
+        );
+        serverConfig.setApplicationName(
+                CommonUtils.isEmpty(PropertiesLoader.getPropertiesStr(APPLICATION_NAME)) ?
+                        DEFAULT_APPLICATION_NAME :
+                        PropertiesLoader.getPropertiesStr(APPLICATION_NAME)
+        );
+        serverConfig.setRegisterAddr(
+                CommonUtils.isEmpty(PropertiesLoader.getPropertiesStr(REGISTER_ADDRESS)) ?
+                        DEFAULT_REGISTRY_ADDR :
+                        PropertiesLoader.getPropertiesStr(REGISTER_ADDRESS)
+        );
+        serverConfig.setServerSerialize(
+                CommonUtils.isEmpty(PropertiesLoader.getPropertiesStr(SERVER_SERIALIZE)) ?
+                        DEFAULT_SERVER_SERIALIZE_TYPE :
+                        PropertiesLoader.getPropertiesStr(SERVER_SERIALIZE)
+        );
+        serverConfig.setBusinessThreadNum(
+                PropertiesLoader.getPropertiesInteger(BUSINESS_THREAD_NUM) == null ?
+                        DEFAULT_BUSINESS_THREAD_NUM :
+                        PropertiesLoader.getPropertiesInteger(BUSINESS_THREAD_NUM)
+        );
+        serverConfig.setBlockingQueueLength(
+                PropertiesLoader.getPropertiesInteger(BLOCKING_QUEUE_LENGTH) == null ?
+                        DEFAULT_BLOCKING_QUEUE_LEN :
+                        PropertiesLoader.getPropertiesInteger(BLOCKING_QUEUE_LENGTH)
+        );
         return serverConfig;
     }
 
@@ -39,12 +67,33 @@ public class PropertiesBootstrap {
             throw new RuntimeException("loadClientConfigFromLocal fail,e is {}", e);
         }
         ClientConfig clientConfig = new ClientConfig();
-        clientConfig.setApplicationName(PropertiesLoader.getPropertiesStr(APPLICATION_NAME));
-        clientConfig.setRegisterAddr(PropertiesLoader.getPropertiesStr(REGISTER_ADDRESS));
-        clientConfig.setProxyType(PropertiesLoader.getPropertiesStr(PROXY_TYPE));
-        clientConfig.setRouterStrategy(PropertiesLoader.getPropertiesStr(ROUTER_STRATEGY));
-        clientConfig.setClientSerialize(PropertiesLoader.getPropertiesStr(CLIENT_SERIALIZE));
-        clientConfig.setRegistryType(PropertiesLoader.getPropertiesStr(REGISTRY_TYPE));
+        clientConfig.setApplicationName(
+                CommonUtils.isEmpty(PropertiesLoader.getPropertiesStr(APPLICATION_NAME)) ?
+                        DEFAULT_APPLICATION_NAME :
+                        PropertiesLoader.getPropertiesStr(APPLICATION_NAME));
+        clientConfig.setRegisterAddr(
+                CommonUtils.isEmpty(PropertiesLoader.getPropertiesStr(REGISTER_ADDRESS)) ?
+                        DEFAULT_REGISTRY_ADDR :
+                        PropertiesLoader.getPropertiesStr(REGISTER_ADDRESS));
+        clientConfig.setProxyType(
+                CommonUtils.isEmpty(PropertiesLoader.getPropertiesStr(PROXY_TYPE)) ?
+                        DEFAULT_PROXY_TYPE :
+                        PropertiesLoader.getPropertiesStr(PROXY_TYPE));
+        clientConfig.setRouterStrategy(
+                CommonUtils.isEmpty(PropertiesLoader.getPropertiesStr(ROUTER_STRATEGY)) ?
+                        DEFAULT_ROUTER_STRATEGY :
+                        PropertiesLoader.getPropertiesStr(ROUTER_STRATEGY)
+                );
+        clientConfig.setClientSerialize(
+                CommonUtils.isEmpty(PropertiesLoader.getPropertiesStr(CLIENT_SERIALIZE)) ?
+                        DEFAULT_CLIENT_SERIALIZE_TYPE :
+                        PropertiesLoader.getPropertiesStr(CLIENT_SERIALIZE)
+        );
+        clientConfig.setRegistryType(
+                CommonUtils.isEmpty(PropertiesLoader.getPropertiesStr(REGISTRY_TYPE)) ?
+                        DEFAULT_REGISTRY_TYPE :
+                        PropertiesLoader.getPropertiesStr(REGISTRY_TYPE)
+        );
         return clientConfig;
     }
 

@@ -230,7 +230,7 @@ public class Client {
         rpcReferenceWrapper.setGroup("dev");
         rpcReferenceWrapper.setAimClass(DataService.class);
         rpcReferenceWrapper.setServiceToken("token-a");
-        rpcReferenceWrapper.setAsync(true); // 是否异步调用
+        rpcReferenceWrapper.setAsync(false); // 是否异步调用
         DataService dataService = rpcReference.get(rpcReferenceWrapper);
         client.doSubscribeService(DataService.class);
         ConnectionHandler.setBootstrap(client.getBootstrap());
