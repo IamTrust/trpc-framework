@@ -15,6 +15,7 @@ public class PropertiesBootstrap {
     public static final String REGISTRY_TYPE = "trpc.registry";
     public static final String BUSINESS_THREAD_NUM = "trpc.business.thread.num";
     public static final String BLOCKING_QUEUE_LENGTH = "trpc.blocking.queue.length";
+    public static final String SERVER_REQUEST_DATA = "trpc.server.request.data";
 
     public static ServerConfig loadServerConfigFromLocal() {
         try {
@@ -29,6 +30,7 @@ public class PropertiesBootstrap {
         serverConfig.setServerSerialize(PropertiesLoader.getPropertiesStr(SERVER_SERIALIZE));
         serverConfig.setBusinessThreadNum(PropertiesLoader.getPropertiesInteger(BUSINESS_THREAD_NUM));
         serverConfig.setBlockingQueueLength(PropertiesLoader.getPropertiesInteger(BLOCKING_QUEUE_LENGTH));
+        serverConfig.setMaxServerRequestData(PropertiesLoader.getPropertiesInteger(SERVER_REQUEST_DATA));
         return serverConfig;
     }
 

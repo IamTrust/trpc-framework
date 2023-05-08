@@ -20,4 +20,6 @@ public class RpcConstants {
     public static final String JDK_SERIALIZE = "jdk";
 
     public static final String FAST_JSON_SERIALIZE = "fastJson";
+
+    public static final String DEFAULT_DECODE_CHAR = "$_i0#Xsop1_$";
 }

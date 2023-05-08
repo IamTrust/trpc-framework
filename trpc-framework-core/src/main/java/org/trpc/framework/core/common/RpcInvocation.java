@@ -23,6 +23,8 @@ public class RpcInvocation implements Serializable {
     private Object response;
     // 附加信息
     private Map<String, Object> attachments = new ConcurrentHashMap<>();
+    // 异常信息(如果被调用方法抛出异常则会塞入这个字段返回给客户端)
+    private Throwable e;
 
     public Map<String, Object> getAttachments() {
         return attachments;
@@ -70,5 +72,13 @@ public class RpcInvocation implements Serializable {
 
     public void setResponse(Object response) {
         this.response = response;
+    }
+
+    public Throwable getE() {
+        return e;
+    }
+
+    public void setE(Throwable e) {
+        this.e = e;
     }
 }

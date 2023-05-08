@@ -15,9 +15,20 @@ public class ServerConfig {
 
     private String serverSerialize;
 
+    /**
+     * 服务端用于存放待处理的请求的阻塞队列的长度
+     */
     private Integer blockingQueueLength;
 
+    /**
+     * 服务端业务线程数目
+     */
     private Integer businessThreadNum;
+
+    /**
+     * 服务端最大接受的数据包体积
+     */
+    private Integer maxServerRequestData;
 
     public String getRegisterAddr() {
         return registerAddr;
@@ -65,5 +76,13 @@ public class ServerConfig {
 
     public void setBusinessThreadNum(Integer businessThreadNum) {
         this.businessThreadNum = businessThreadNum;
+    }
+
+    public Integer getMaxServerRequestData() {
+        return maxServerRequestData;
+    }
+
+    public void setMaxServerRequestData(Integer maxServerRequestData) {
+        this.maxServerRequestData = maxServerRequestData;
     }
 }

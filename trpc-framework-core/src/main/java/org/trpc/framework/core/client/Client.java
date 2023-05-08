@@ -19,29 +19,19 @@ import org.trpc.framework.core.common.util.CommonUtils;
 import org.trpc.framework.core.config.ClientConfig;
 import org.trpc.framework.core.config.PropertiesBootstrap;
 import org.trpc.framework.core.filter.IClientFilter;
-import org.trpc.framework.core.filter.client.DirectInvokeFilterImpl;
-import org.trpc.framework.core.filter.client.GroupFilterImpl;
-import org.trpc.framework.core.filter.client.LogFilterImpl;
 import org.trpc.framework.core.proxy.ProxyFactory;
-import org.trpc.framework.core.proxy.jdk.JDKProxyFactory;
 import org.trpc.framework.core.registry.AbstractRegister;
 import org.trpc.framework.core.registry.RegistryService;
 import org.trpc.framework.core.registry.URL;
 import org.trpc.framework.core.router.IRouter;
-import org.trpc.framework.core.router.RandomRouterImpl;
-import org.trpc.framework.core.router.RotateRouterImpl;
 import org.trpc.framework.core.serialize.SerializeFactory;
-import org.trpc.framework.core.serialize.fastjson.FastJsonSerializeFactory;
-import org.trpc.framework.core.serialize.jdk.JDKSerializeFactory;
 import org.trpc.framework.interfaces.DataService;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.trpc.framework.core.common.cache.CommonClientCache.*;
-import static org.trpc.framework.core.common.constant.RpcConstants.*;
 import static org.trpc.framework.core.spi.ExtensionLoader.EXTENSION_LOADER_CLASS_CACHE;
 
 /**
@@ -230,20 +220,22 @@ public class Client {
         rpcReferenceWrapper.setGroup("dev");
         rpcReferenceWrapper.setAimClass(DataService.class);
         rpcReferenceWrapper.setServiceToken("token-a");
-        rpcReferenceWrapper.setAsync(true); // 是否异步调用
+        rpcReferenceWrapper.setAsync(false); // 是否异步调用
         DataService dataService = rpcReference.get(rpcReferenceWrapper);
         client.doSubscribeService(DataService.class);
         ConnectionHandler.setBootstrap(client.getBootstrap());
         client.doConnectServer();
         client.startClient();
-        for (int i = 0; i < 100; i++) {
-            try {
-                String result = dataService.sendData("test");
-                System.out.println(result);
-                Thread.sleep(1000);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
+        //for (int i = 0; i < 100; i++) {
+        //    try {
+        //        String result = dataService.sendData("test");
+        //        System.out.println(result);
+        //        Thread.sleep(1000);
+        //    }catch (Exception e){
+        //        e.printStackTrace();
+        //    }
+        //}
+        String res = dataService.getDataWithException(false);
+        System.out.println(res);
     }
 }

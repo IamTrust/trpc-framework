@@ -23,4 +23,11 @@ public class DataServiceImpl implements DataService {
         list.add("data3");
         return list;
     }
+
+    @Override
+    public String getDataWithException(boolean hasException) throws Exception {
+        if (hasException)
+            throw new Exception("getDataWithException 抛出了异常");
+        return "called getDataWithException";
+    }
 }

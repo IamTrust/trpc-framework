@@ -18,4 +18,11 @@ public interface DataService {
      */
     List<String> getList();
 
+    /**
+     * 测试抛出异常
+     *
+     * @return
+     */
+    String getDataWithException(boolean hasException) throws Exception;
+
 }

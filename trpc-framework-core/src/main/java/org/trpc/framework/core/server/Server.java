@@ -1,12 +1,15 @@
 package org.trpc.framework.core.server;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import org.trpc.framework.core.common.RpcDecoder;
 import org.trpc.framework.core.common.RpcEncoder;
 import org.trpc.framework.core.common.event.TRpcListenerLoader;
@@ -29,8 +32,7 @@ import java.util.Map;
 import static org.trpc.framework.core.common.cache.CommonClientCache.CLIENT_SERIALIZE_FACTORY;
 import static org.trpc.framework.core.common.cache.CommonClientCache.EXTENSION_LOADER;
 import static org.trpc.framework.core.common.cache.CommonServerCache.*;
-import static org.trpc.framework.core.common.constant.RpcConstants.FAST_JSON_SERIALIZE;
-import static org.trpc.framework.core.common.constant.RpcConstants.JDK_SERIALIZE;
+import static org.trpc.framework.core.common.constant.RpcConstants.*;
 import static org.trpc.framework.core.spi.ExtensionLoader.EXTENSION_LOADER_CLASS_CACHE;
 
 /**
@@ -73,6 +75,8 @@ public class Server {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
                 System.out.println("初始化provider过程");
+                ByteBuf delimiter = Unpooled.copiedBuffer(DEFAULT_DECODE_CHAR.getBytes());
+                ch.pipeline().addLast(new DelimiterBasedFrameDecoder(serverConfig.getMaxServerRequestData(), delimiter));
                 ch.pipeline().addLast(new RpcEncoder());
                 ch.pipeline().addLast(new RpcDecoder());
                 ch.pipeline().addLast(new ServerHandler());

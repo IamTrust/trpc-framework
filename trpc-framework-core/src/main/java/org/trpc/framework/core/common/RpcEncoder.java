@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
+import static org.trpc.framework.core.common.constant.RpcConstants.DEFAULT_DECODE_CHAR;
+
 /**
  * 序列化
  *
@@ -18,5 +20,7 @@ public class RpcEncoder extends MessageToByteEncoder<RpcProtocol> {
         byteBuf.writeShort(rpcProtocol.getMagicNumber());
         byteBuf.writeInt(rpcProtocol.getContentLength());
         byteBuf.writeBytes(rpcProtocol.getContent());
+        // 协议尾部的终结符，解决粘包问题
+        byteBuf.writeBytes(DEFAULT_DECODE_CHAR.getBytes());
     }
 }

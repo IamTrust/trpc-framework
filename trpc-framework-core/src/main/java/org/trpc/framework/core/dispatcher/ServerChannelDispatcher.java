@@ -72,9 +72,18 @@ public class ServerChannelDispatcher {
                             for (Method method : methods) {
                                 if (method.getName().equals(rpcInvocation.getTargetMethod())) {
                                     if (method.getReturnType().equals(Void.TYPE)) {
-                                        method.invoke(aimObject, rpcInvocation.getArgs());
+                                        try {
+                                            method.invoke(aimObject, rpcInvocation.getArgs());
+                                        } catch (Throwable e) {
+                                            // 方法调用抛出的异常
+                                            rpcInvocation.setE(e);
+                                        }
                                     } else {
-                                        result = method.invoke(aimObject, rpcInvocation.getArgs());
+                                        try {
+                                            result = method.invoke(aimObject, rpcInvocation.getArgs());
+                                        } catch (Throwable e) {
+                                            rpcInvocation.setE(e);
+                                        }
                                     }
                                     break;
                                 }
