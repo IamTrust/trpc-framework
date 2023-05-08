@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  org.trpc.framework.spring.starter.config.TRpcClientAutoConfiguration,\
+  org.trpc.framework.spring.starter.config.TRpcServerAutoConfiguration

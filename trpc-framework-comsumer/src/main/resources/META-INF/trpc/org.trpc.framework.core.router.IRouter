@@ -1,0 +1,2 @@
+random=org.trpc.framework.core.router.RandomRouterImpl
+rotate=org.trpc.framework.core.router.RotateRouterImpl

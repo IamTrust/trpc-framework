@@ -11,6 +11,9 @@
     <modules>
         <module>trpc-framework-core</module>
         <module>trpc-framework-interfaces</module>
+        <module>trpc-framework-spring-starter</module>
+        <module>trpc-framework-provider</module>
+        <module>trpc-framework-comsumer</module>
     </modules>
     <packaging>pom</packaging>
 

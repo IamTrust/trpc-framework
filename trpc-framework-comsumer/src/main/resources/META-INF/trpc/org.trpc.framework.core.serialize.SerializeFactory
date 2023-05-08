@@ -1,0 +1,2 @@
+jdk=org.trpc.framework.core.serialize.jdk.JDKSerializeFactory
+fastJson=org.trpc.framework.core.serialize.fastjson.FastJsonSerializeFactory

@@ -1,0 +1,3 @@
+directInvoke=org.trpc.framework.core.filter.client.DirectInvokeFilterImpl
+group=org.trpc.framework.core.filter.client.GroupFilterImpl
+log=org.trpc.framework.core.filter.client.LogFilterImpl

@@ -1,0 +1,1 @@
+zookeeper=org.trpc.framework.core.registry.zookeeper.ZookeeperRegister
